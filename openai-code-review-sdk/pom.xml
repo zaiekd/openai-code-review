@@ -111,7 +111,7 @@
                     <archive>
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <mainClass>org.zaiekd.middleware.sdk.LlmCodeReview</mainClass>
+                            <mainClass>org.zaiekd.middleware.sdk.OpenAiCodeReview</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
