@@ -2,8 +2,8 @@ package org.zaiekd.middleware.sdk;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.Buffer;
 
 /**
  * @author lhz
@@ -12,11 +12,11 @@ import java.nio.Buffer;
  */
 public class OpenAiCodeReview {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("Test");
 
         // 1. 代码检出
-        ProcessBuilder processBuilder = new ProcessBuilder("git", "diff", "HEAD~1", 'HEAD');
+        ProcessBuilder processBuilder = new ProcessBuilder("git", "diff", "HEAD~1", "HEAD");
         processBuilder.directory(new File("."));
 
         Process process = processBuilder.start();
