@@ -1,4 +1,6 @@
-package org.zaiekd.middleware.sdk.domain.model;
+package org.zaiekd.middleware.sdk.infrastructure.openai.dto;
+
+import org.zaiekd.middleware.sdk.domain.model.Model;
 
 import java.util.List;
 
@@ -7,7 +9,7 @@ import java.util.List;
  * @version 1.0
  * @create 2/15/25 3:08 PM
  */
-public class ChatCompletionRequest {
+public class ChatCompletionRequestDTO {
 
     private String model = Model.GLM_4_FLASH.getCode();
     private List<Prompt> messages;

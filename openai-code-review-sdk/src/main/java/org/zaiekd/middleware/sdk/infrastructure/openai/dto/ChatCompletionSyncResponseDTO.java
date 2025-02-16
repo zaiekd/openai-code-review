@@ -1,4 +1,4 @@
-package org.zaiekd.middleware.sdk.domain.model;
+package org.zaiekd.middleware.sdk.infrastructure.openai.dto;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import java.util.List;
  * @version 1.0
  * @create 2/15/25 3:12 PM
  */
-public class ChatCompletionSyncResponse {
+public class ChatCompletionSyncResponseDTO {
     private List<Choice> choices;
 
     public static class Choice {
