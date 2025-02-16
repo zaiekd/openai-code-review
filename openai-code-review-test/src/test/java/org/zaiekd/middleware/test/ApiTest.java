@@ -19,7 +19,6 @@ public class ApiTest {
 
     @Test
     public void test() {
-        System.out.println(Integer.parseInt("aaa1234"));
-        System.out.println(Integer.parseInt("aaa5678"));
+        System.out.println(Integer.parseInt("aaa"));
     }
 }
