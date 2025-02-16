@@ -5,8 +5,10 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.zaiekd.middleware.sdk.domain.model.ChatCompletionRequest;
 import org.zaiekd.middleware.sdk.domain.model.ChatCompletionSyncResponse;
+import org.zaiekd.middleware.sdk.domain.model.Message;
 import org.zaiekd.middleware.sdk.domain.model.Model;
 import org.zaiekd.middleware.sdk.types.utils.BearerTokenUtils;
+import org.zaiekd.middleware.sdk.types.utils.WXAccessTokenUtils;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -16,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
+import java.util.Scanner;
 
 /**
  * @author lhz
@@ -59,6 +62,46 @@ public class OpenAiCodeReview {
         String logUrl = writeLog(token, log); // token需要透传获得
         System.out.println("log url: " + logUrl);
 
+        // 4. 消息通知
+        System.out.println("Push Message: " + logUrl);
+        pushMessage(logUrl);
+    }
+
+    private static void pushMessage(String logUrl) {
+        String accessToken = WXAccessTokenUtils.getAccessToken();
+        System.out.println(accessToken);
+
+        Message message = new Message();
+        message.put("project", "big-market");
+        message.put("review", "feat: 新加功能");
+        message.setUrl(logUrl);
+
+        String url = String.format("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=%s", accessToken);
+
+        sendPostRequest(url, JSON.toJSONString(message));
+    }
+
+    private static void sendPostRequest(String urlString, String jsonBody) {
+        try {
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json; utf-8");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setDoOutput(true);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            try (Scanner scanner = new Scanner(conn.getInputStream(), StandardCharsets.UTF_8.name())) {
+                String response = scanner.useDelimiter("\\A").next();
+                System.out.println(response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static String codeReview(String diffCode) throws Exception {
@@ -78,12 +121,12 @@ public class OpenAiCodeReview {
         ChatCompletionRequest chatCompletionRequest = new ChatCompletionRequest();
         chatCompletionRequest.setModel(Model.GLM_4_FLASH.getCode());
 
-        chatCompletionRequest.setMessages(new ArrayList<ChatCompletionRequest.Prompt>(){{
+        chatCompletionRequest.setMessages(new ArrayList<ChatCompletionRequest.Prompt>() {{
             add(new ChatCompletionRequest.Prompt("user", "你是一个高级编程架构师，精通各类场景方案、架构设计和编程语言请，请您根据git diff记录，对代码做出评审。代码为:"));
             add(new ChatCompletionRequest.Prompt("user", diffCode));
         }});
 
-        try(OutputStream os = connection.getOutputStream()) {
+        try (OutputStream os = connection.getOutputStream()) {
             byte[] input = JSON.toJSONString(chatCompletionRequest).getBytes(StandardCharsets.UTF_8);
             os.write(input);
         }

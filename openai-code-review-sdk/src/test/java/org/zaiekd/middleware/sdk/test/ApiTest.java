@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import org.junit.Test;
 import org.zaiekd.middleware.sdk.domain.model.ChatCompletionSyncResponse;
 import org.zaiekd.middleware.sdk.types.utils.BearerTokenUtils;
+import org.zaiekd.middleware.sdk.types.utils.WXAccessTokenUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +14,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 /**
  * @author lhz
@@ -22,9 +26,9 @@ import java.nio.charset.StandardCharsets;
 public class ApiTest {
 
     public static void main(String[] args) {
-         String apiKeySecret = "936816fa02004abd9a3a7aaae51d70aa.eB8HmgXpF5z3fmo6";
-         String token = BearerTokenUtils.getToken(apiKeySecret);
-         System.out.println(token);
+        String apiKeySecret = "936816fa02004abd9a3a7aaae51d70aa.eB8HmgXpF5z3fmo6";
+        String token = BearerTokenUtils.getToken(apiKeySecret);
+        System.out.println(token);
     }
 
     @Test
@@ -53,7 +57,7 @@ public class ApiTest {
                 + "]"
                 + "}";
 
-        try(OutputStream os = connection.getOutputStream()) {
+        try (OutputStream os = connection.getOutputStream()) {
             byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
             os.write(input);
         }
@@ -74,5 +78,90 @@ public class ApiTest {
 
         ChatCompletionSyncResponse response = JSON.parseObject(content.toString(), ChatCompletionSyncResponse.class);
         System.out.println(response.getChoices().get(0).getMessage().getContent());
+    }
+
+    @Test
+    public void test_wx() {
+        String accessToken = WXAccessTokenUtils.getAccessToken();
+        System.out.println(accessToken);
+
+        Message message = new Message();
+        message.put("project", "big-market");
+        message.put("review", "feat: 新加功能");
+
+        String url = String.format("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=%s", accessToken);
+
+        sendPostRequest(url, JSON.toJSONString(message));
+    }
+
+    private static void sendPostRequest(String urlString, String jsonBody) {
+        try {
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json; utf-8");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setDoOutput(true);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            try (Scanner scanner = new Scanner(conn.getInputStream(), StandardCharsets.UTF_8.name())) {
+                String response = scanner.useDelimiter("\\A").next();
+                System.out.println(response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static class Message {
+        private String touser = "oXVlR7D_TDTMLRXPPslyvIcC2NFE";
+        private String template_id = "rtU46v3GMGESJzrEgLgflA1X790LWiGazERJZaAvkIA";
+        private String url = "https://github.com/zaiekd/openai-code-review-log/blob/main/2025-02-15%2022%3A50%3A01/V0UoCAfuOVoS.md";
+        private Map<String, Map<String, String>> data = new HashMap<>();
+
+        public void put(String key, String value) {
+            data.put(key, new HashMap<String, String>() {
+                {
+                    put("value", value);
+                }
+            });
+        }
+
+        public String getTouser() {
+            return touser;
+        }
+
+        public void setTouser(String touser) {
+            this.touser = touser;
+        }
+
+        public String getTemplate_id() {
+            return template_id;
+        }
+
+        public void setTemplate_id(String template_id) {
+            this.template_id = template_id;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public Map<String, Map<String, String>> getData() {
+            return data;
+        }
+
+        public void setData(Map<String, Map<String, String>> data) {
+            this.data = data;
+        }
     }
 }
