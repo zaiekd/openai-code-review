@@ -26,7 +26,7 @@ public class OpenAiCodeReview {
     private String weixin_template_id = "rtU46v3GMGESJzrEgLgflA1X790LWiGazERJZaAvkIA";
 
     // ChatGLM 配置
-    private String chatglm_apiHost = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
+    private String chatglm_apiHost = "https://api.deepseek.com/chat/completions";
     private String chatglm_apiKeySecret = "";
 
     // Github 配置
