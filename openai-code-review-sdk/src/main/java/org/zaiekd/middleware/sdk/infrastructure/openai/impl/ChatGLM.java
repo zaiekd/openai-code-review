@@ -34,7 +34,7 @@ public class ChatGLM implements IOpenAI {
     }
 
     public ChatCompletionSyncResponseDTO completions(ChatCompletionRequestDTO requestDTO) throws Exception {
-        String token = BearerTokenUtils.getToken(apiKeySecret);
+        String token = apiKeySecret;
 
         URL url = new URL(apiHost);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
